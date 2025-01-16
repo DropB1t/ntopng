@@ -817,6 +817,7 @@ class Host : public GenericHashEntry,
   virtual u_int32_t getNTPContactCardinality() { return (0); }
   virtual u_int32_t getDNSContactCardinality() { return (0); }
   virtual u_int32_t getSMTPContactCardinality() { return (0); }
+  virtual u_int16_t getContactsAsCliCardinality() { return (0); }
 
 #ifdef NTOPNG_PRO
   /* Alert Exclusions */

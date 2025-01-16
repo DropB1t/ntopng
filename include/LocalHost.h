@@ -114,6 +114,9 @@ class LocalHost : public Host {
   virtual u_int16_t getNumActiveContactsAsClient() {
     return stats->getNumActiveContactsAsClient();
   };
+  virtual u_int16_t getContactsAsCliCardinality() {
+    return stats->getContactsAsCliCardinality();
+  };
   virtual u_int16_t getNumActiveContactsAsServer() {
     return stats->getNumActiveContactsAsServer();
   };

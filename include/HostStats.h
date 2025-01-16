@@ -232,6 +232,7 @@ class HostStats : public GenericTrafficElement {
     return ((u_int16_t)-1);
   }
   virtual u_int16_t getContactedHostsCardinality() { return ((u_int16_t)-1); }
+  virtual u_int16_t getContactsAsCliCardinality() { return ((u_int16_t)-1); }
 
   virtual u_int32_t getNTPContactCardinality() { return ((u_int32_t)-1); }
   virtual u_int32_t getDNSContactCardinality() { return ((u_int32_t)-1); }

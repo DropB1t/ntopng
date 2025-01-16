@@ -45,6 +45,7 @@
 #include "host_alerts/ScoreAnomalyAlert.h"
 #include "host_alerts/DomainNamesContactsAlert.h"
 #include "host_alerts/ScanDetectionAlert.h"
+#include "host_alerts/NetScanDetectionAlert.h"
 #include "host_alerts/TrafficVolumeAlert.h"
 #include "host_alerts/HostScannerAlert.h"
 

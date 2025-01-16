@@ -181,6 +181,9 @@ class LocalHostStats : public HostStats {
   virtual u_int16_t getContactedHostsCardinality() {
     return ((u_int16_t)num_contacted_hosts.getEstimate());
   } /* Get the hosts */
+  virtual u_int16_t getContactsAsCliCardinality() {
+    return (contacts_as_cli.getEstimate());
+  }
   virtual u_int32_t getNTPContactCardinality() {
     return (num_ntp_servers.getEstimate());
   };
