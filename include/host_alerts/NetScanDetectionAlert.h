@@ -26,8 +26,7 @@
 
 class NetScanDetectionAlert : public HostAlert {
  private:
-  u_int64_t num_incomplete_flows, num_incomplete_flows_threshold;
-  u_int16_t num_contacts_as_cli, num_contacts_as_cli_treshold;
+  u_int32_t num_contacts_as_cli, num_contacts_as_cli_treshold;
 
   ndpi_serializer* getAlertJSON(ndpi_serializer* serializer);
 
@@ -37,10 +36,9 @@ class NetScanDetectionAlert : public HostAlert {
   }
 
   NetScanDetectionAlert(HostCheck* c, Host* f, risk_percentage cli_pctg,
-                     u_int16_t _num_contacts_as_cli,
-                     u_int16_t _num_contacts_as_cli_treshold,
-                     u_int32_t _num_incomplete_flows,
-                     u_int32_t _num_incomplete_flows_threshold);
+                     u_int32_t _num_contacts_as_cli,
+                     u_int32_t _num_contacts_as_cli_treshold);
+
   ~NetScanDetectionAlert(){};
 
   HostAlertType getAlertType() const { return getClassType(); }

@@ -116,6 +116,14 @@ class Host : public GenericHashEntry,
   */
   u_int32_t num_incomplete_flows;
 
+  /* NetScan contacted clients bucket detector */
+  struct {
+    std::deque<time_t> *bucket;  // 8 bytes (pointer)
+    time_t t_window;             // 8 bytes
+    size_t bucket_capacity;      // 8 bytes
+  } netScanDetector;
+
+
   struct {
     u_int8_t alertTriggered : 1, hostAlreadyEvaluated : 1,
       checkAlreadyExecutedOnce : 1, _not_used : 7;
@@ -789,6 +797,17 @@ class Host : public GenericHashEntry,
 
   virtual void setOS(OSType _os, OSLearningMode mode);
   OSType getOS() const { return os_type; }
+
+  void incNetScanDetectorContact(time_t cur_t, IpAddress *srv_ip);
+
+  void cleanupNetScanDetectorContacts(time_t cur_t);
+
+  void resetNetScanDetectorContacts() {
+    netScanDetector.bucket->clear();
+  }
+  size_t getNetScanDetectorContacts() const {
+    return netScanDetector.bucket->size();
+  }
 
   void incCliContactedHosts(IpAddress *peer) {
     stats->incCliContactedHosts(peer);

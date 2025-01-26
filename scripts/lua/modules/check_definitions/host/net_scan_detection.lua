@@ -17,23 +17,9 @@ local script = {
   severity = alert_consts.get_printable_severities().error,
   
   default_value = {
-    incomplete_flows = {
-        default_value = 32,
-        field_min = 1,
-        field_max = 65535,
-        field_operator = "gt",
-        i18n_fields_unit = checks.field_units.flows,
-        i18n_title = 'incomplete_flows'
-    },
-    contacts_as_client = {
-        default_value = 8,
-        field_min = 1,
-        field_max = 65535,
-        field_operator = "gt",
-        i18n_fields_unit = checks.field_units.flows,
-        i18n_title = 'contacts_as_client'
-    },
-  },
+    operator = "gt",
+    threshold = 30,
+ },
 
   -- See below
   hooks = {},
@@ -43,6 +29,15 @@ local script = {
     i18n_title = "entity_thresholds.net_scan_detection_title",
     i18n_description = "entity_thresholds.net_scan_detection_description",
     input_builder = "threshold_cross",
+
+    -- Specific parameters of this input builder
+    i18n_field_unit = checks.field_units.contacts,
+    -- max allowed threshold value
+    field_max = 65535,
+    -- min allowed threshold value
+    field_min = 1,
+    -- threshold check operator. "gt" for ">", "lt" or "<"
+    field_operator = "gt";
   }
 }
 

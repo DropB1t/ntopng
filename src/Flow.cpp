@@ -157,6 +157,8 @@ Flow::Flow(NetworkInterface *_iface,
     cli_host->incUses(), cli_host->incNumFlows(last_seen, true, isTCP());
     cli_host->incCliContactedPorts(_srv_port);
     cli_ip_addr = cli_host->get_ip();
+    if (isTCP() || isUDP() || isICMP())
+      cli_host->incNetScanDetectorContact(last_seen, srv_host->get_ip());
   } else {
     /*
       View Interface
@@ -1930,6 +1932,7 @@ void Flow::hosts_periodic_stats_update(NetworkInterface *iface, Host *cli_host,
 
     updateServerPortsStats(srv_host, &ndpiDetectedProtocol, get_first_seen());
     updateClientContactedPorts(cli_host, &ndpiDetectedProtocol);
+    cli_host->cleanupNetScanDetectorContacts(tv->tv_sec);
 
     if(cli_network_id >= 0 && (cli_network_id == srv_network_id))
       cli_and_srv_in_same_subnet = true;

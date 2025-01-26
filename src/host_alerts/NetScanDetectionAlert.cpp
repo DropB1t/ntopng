@@ -25,23 +25,17 @@
 
 NetScanDetectionAlert::NetScanDetectionAlert(
     HostCheck* c, Host* f, risk_percentage cli_pctg,
-    u_int16_t _num_contacts_as_cli, u_int16_t _num_contacts_as_cli_treshold,
-    u_int32_t _num_incomplete_flows, u_int32_t _num_incomplete_flows_threshold)
+    u_int32_t _num_contacts_as_cli, u_int32_t _num_contacts_as_cli_treshold)
     : HostAlert(c, f, cli_pctg) {
   num_contacts_as_cli = _num_contacts_as_cli,
   num_contacts_as_cli_treshold = _num_contacts_as_cli_treshold;
-  num_incomplete_flows = _num_incomplete_flows,
-  num_incomplete_flows_threshold = _num_incomplete_flows_threshold;
 };
 
 /* ***************************************************** */
 
 ndpi_serializer* NetScanDetectionAlert::getAlertJSON(ndpi_serializer* serializer) {
   if (serializer == NULL) return NULL;
-
-  ndpi_serialize_string_uint64(serializer, "incomplete_flows", this->num_incomplete_flows);
   ndpi_serialize_string_uint64(serializer, "contacts_as_cli", this->num_contacts_as_cli);
-
   return serializer;
 }
 

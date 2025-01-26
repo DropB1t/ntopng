@@ -26,19 +26,14 @@
 
 class NetScanDetection : public HostCheck {
  private:
-  u_int32_t num_incomplete_flows_threshold;
-  u_int16_t num_contacts_as_cli_treshold;
+  u_int32_t num_contacts_as_cli_treshold;
 
   HostAlert *allocAlert(HostCheck *c, Host *f, risk_percentage cli_pctg,
-                        u_int16_t _num_contacts_as_cli,
-                        u_int16_t _num_contacts_as_cli_treshold,
-                        u_int32_t _num_incomplete_flows,
-                        u_int32_t _num_incomplete_flows_threshold) {
+                        u_int32_t _num_contacts_as_cli,
+                        u_int32_t _num_contacts_as_cli_treshold) {
     return new NetScanDetectionAlert(c, f, cli_pctg,
                                   _num_contacts_as_cli,
-                                  _num_contacts_as_cli_treshold,
-                                  _num_incomplete_flows,
-                                  _num_incomplete_flows_threshold);
+                                  _num_contacts_as_cli_treshold);
   };
 
  public:

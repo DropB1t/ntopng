@@ -102,6 +102,7 @@ Host::~Host() {
   if(snmp_flood.victim_counter) delete snmp_flood.victim_counter;
   if(rst_scan.attacker_counter) delete rst_scan.attacker_counter;
   if(rst_scan.victim_counter) delete rst_scan.victim_counter;
+  if(netScanDetector.bucket) delete netScanDetector.bucket;
 
   if(stats) delete stats;
   if(stats_shadow) delete stats_shadow;
@@ -293,6 +294,10 @@ void Host::initialize(Mac *_mac, int32_t _iface_idx, u_int16_t _vlanId,
   as = NULL, asn = 0, asname = NULL, obs_point = NULL;
   os_type = os_unknown;
   ssdpLocation = NULL, blacklist_name = NULL, country = NULL;
+
+  netScanDetector.t_window = 60*30; /* 30 min */
+  netScanDetector.bucket_capacity = netScanDetector.t_window / 2; /* sliding window capacity */
+  netScanDetector.bucket = new (std::nothrow) std::deque<time_t>(); 
 
   memset(&names, 0, sizeof(names));
   memset(view_interface_mac, 0, sizeof(view_interface_mac));
@@ -1500,6 +1505,22 @@ void Host::decNumFlows(time_t t, bool as_client, bool isTCP,
     num_active_flows_as_client--;
   else
     num_active_flows_as_server--;
+}
+
+/* *************************************** */
+
+void Host::incNetScanDetectorContact(time_t cur_t, IpAddress *srv_ip) {
+  if (netScanDetector.bucket->size() < netScanDetector.bucket_capacity) {
+    if (srv_ip->isLocalHost() && !srv_ip->isGateway() && !srv_ip->isMulticastAddress() && !srv_ip->isBroadcastAddress()) {
+      netScanDetector.bucket->push_back(cur_t);
+    }
+  }
+}
+
+void Host::cleanupNetScanDetectorContacts(time_t cur_t) {
+  while (!(netScanDetector.bucket)->empty() &&
+         cur_t - (netScanDetector.bucket->front()) > netScanDetector.t_window)
+    netScanDetector.bucket->pop_front();
 }
 
 /* *************************************** */
