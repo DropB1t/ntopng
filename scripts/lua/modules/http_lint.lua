@@ -2163,6 +2163,7 @@ local known_parameters = {
     -- Active monitoring
     ["am_host"] = {http_lint.webhookCleanup, http_lint.validateUnquoted},
     ["old_am_host"] = {http_lint.webhookCleanup, http_lint.validateUnquoted},
+    ["old_host"] = {http_lint.webhookCleanup, http_lint.validateUnquoted},
     ["threshold"] = http_lint.validateEmptyOr(http_lint.validateNumber),
     ["measurement"] = validateMeasurement,
     ["old_measurement"] = validateMeasurement,

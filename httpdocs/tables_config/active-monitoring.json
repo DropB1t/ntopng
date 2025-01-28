@@ -1,0 +1,134 @@
+{
+	"id": "active_monitoring",
+	"data_url": "lua/rest/v2/get/active_monitoring/list.lua",
+	"use_current_page": false,
+	"enable_search": true,
+	"paging": false,
+	"display_empty_rows": true,
+	"default_sort": {
+		"column_id": "target",
+		"sort": 1
+	},
+	"columns": [
+		{
+			"id": "actions",
+			"title_i18n": "actions",
+			"sortable": false,
+			"sticky": true,
+			"class": [
+				"text-nowrap",
+				"text-center"
+			],
+			"render_v_node_type": "button_list",
+			"button_def_array": [
+				{
+					"id": "timeseries",
+					"icon": "fas fa-chart-area",
+					"title_i18n": "prefs.timeseries",
+					"class": [
+						"link-button",
+						"btn-info"
+					],
+					"event_id": "click_button_timeseries"
+				},
+				{
+					"id": "edit",
+					"icon": "fas fa-edit",
+					"title_i18n": "edit",
+					"class": [
+						"link-button",
+						"btn-info"
+					],
+					"event_id": "click_button_edit"
+				},
+				{
+					"id": "delete",
+					"icon": "fas fa fa-trash",
+					"title_i18n": "delete",
+					"class": [
+						"link-button",
+						"btn-info"
+					],
+					"event_id": "click_button_delete"
+				}
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.target",
+			"data_field": "target",
+			"sortable": true,
+			"min-width": "180px",
+			"class": [
+				"text-nowrap"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.last_ip",
+			"data_field": "ip_address",
+			"sortable": true,
+			"min-width": "120px",
+			"class": [
+				"text-nowrap"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.measurement_type",
+			"data_field": "measurement_type",
+			"sortable": true,
+			"min-width": "120px",
+			"class": [
+				"text-nowrap"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.threshold",
+			"data_field": "threshold",
+			"sortable": true,
+			"min-width": "90px",
+			"class": [
+				"text-nowrap",
+				"text-center"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.last_24_hours",
+			"data_field": "hourly_stats",
+			"sortable": false,
+			"min-width": "180px",
+			"class": [
+				"text-nowrap",
+				"text-center"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.last_measurement",
+			"data_field": "last_measurement_time",
+			"sortable": true,
+			"min-width": "90px",
+			"class": [
+				"text-nowrap",
+				"text-center"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.measurement_value",
+			"data_field": "measurement_value",
+			"sortable": true,
+			"min-width": "90px",
+			"class": [
+				"text-nowrap",
+				"text-center"
+			]
+		},
+		{
+			"title_i18n": "active_monitoring_page.rtt_vs_jitter",
+			"data_field": "extra_measurements",
+			"sortable": false,
+			"min-width": "90px",
+			"class": [
+				"text-nowrap",
+				"text-center"
+			]
+		}
+	]
+}

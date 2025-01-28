@@ -340,7 +340,7 @@ const sources_types = [
 	},
 	{
 		id: "active_monitoring",
-		regex_page_url: "lua\/monitor\/active_monitoring_monitor.lua",
+		regex_page_url: "lua\/active_monitoring.lua",
 		label: i18n("page_stats.source_def.active_monitoring"),
 		query: "am",
 		source_def_array: [{

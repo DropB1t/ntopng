@@ -63,12 +63,10 @@ local infrastructure_instances = {}
 if ntop.isEnterpriseM() then
     local infrastructure_utils = require("infrastructure_utils")
     for _, v in pairs(infrastructure_utils.get_all_instances()) do
-        if v.interfaces and #v.interfaces > 0 then
-            infrastructure_instances[v.id] = {
-               name = v.alias,
-               url = v.url,
-            }
-        end
+        infrastructure_instances[v.id] = {
+           name = v.alias,
+           url = v.url,
+        }
     end
     local view = _GET["view"]
     infrastructure_view = view and view == 'infrastructure' and table.len(infrastructure_instances) > 0
@@ -303,11 +301,17 @@ else
                 url = "/lua/pro/enterprise/snmpdevices_stats.lua"
             }, {
                 entry = page_utils.menu_entries.active_monitoring,
-                url = "/lua/monitor/active_monitoring_monitor.lua"
+                url = "/lua/active_monitoring.lua"
             }, {
                 entry = page_utils.menu_entries.vulnerability_scan,
                 url = '/lua/vulnerability_scan.lua',
                 hidden = not vs_utils.is_available()
+            },
+            {
+                entry = page_utils.menu_entries.infrastructure_dashboard,
+                hidden = (not ntop.isEnterpriseL() and not ntop.isnEdgeEnterprise()) or
+                         not is_admin,
+                url = '/lua/pro/enterprise/infrastructure_dashboard.lua'
             }
         }
     })
@@ -546,11 +550,6 @@ page_utils.add_menubar_section({
 
 local poller_entries = {
     {
-        entry = page_utils.menu_entries.infrastructure_dashboard,
-        hidden = (not ntop.isEnterpriseL() and not ntop.isnEdgeEnterprise()) or
-            not is_admin,
-        url = '/lua/pro/enterprise/infrastructure_dashboard.lua'
-    }, {
         entry = page_utils.menu_entries.snmp,
         hidden = not is_system_interface or
             (not ntop.isEnterpriseM() and not ntop.isnEdgeEnterprise()),
@@ -558,8 +557,14 @@ local poller_entries = {
     }, {
         entry = page_utils.menu_entries.active_monitoring,
         hidden = not is_system_interface,
-        url = "/lua/monitor/active_monitoring_monitor.lua"
-    }
+        url = "/lua/active_monitoring.lua"
+    },
+    {
+        entry = page_utils.menu_entries.infrastructure_dashboard,
+        hidden = (not ntop.isEnterpriseL() and not ntop.isnEdgeEnterprise()) or
+            not is_admin,
+        url = '/lua/pro/enterprise/infrastructure_dashboard.lua'
+    } 
 }
 
 -- Add script entries relative to pollers (e.g., active monitoring) ...

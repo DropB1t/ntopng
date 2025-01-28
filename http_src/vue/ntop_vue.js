@@ -74,6 +74,7 @@ import { default as PageTopInterfaceCategories } from "./page-top-interface-cate
 import { default as PageObservationPoints } from "./page-observation-points.vue"
 import { default as PageObservationPointsConfig } from "./page-observation-points-config.vue"
 import { default as PageObservationPointsList } from "./page-flow-exporters-list.vue"
+import { default as PageActiveMonitoring } from "./page-active-monitoring.vue"
 
 /* Config pages */
 import { default as PageSNMPConfig } from "./page-snmp-config.vue"
@@ -170,6 +171,7 @@ let ntopVue = {
     PageObservationPoints: PageObservationPoints,
     PageObservationPointsConfig: PageObservationPointsConfig,
     PageObservationPointsList: PageObservationPointsList,
+    PageActiveMonitoring: PageActiveMonitoring,
     
     /* SNMP */
     PageSNMPDevices: PageSNMPDevices,
