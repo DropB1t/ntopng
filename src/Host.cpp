@@ -102,7 +102,8 @@ Host::~Host() {
   if(snmp_flood.victim_counter) delete snmp_flood.victim_counter;
   if(rst_scan.attacker_counter) delete rst_scan.attacker_counter;
   if(rst_scan.victim_counter) delete rst_scan.victim_counter;
-  if(netScanDetector.bucket) delete netScanDetector.bucket;
+  if(netScanDetector.bucket_queue) delete netScanDetector.bucket_queue;
+  if(netScanDetector.bucket_set) delete netScanDetector.bucket_set;
 
   if(stats) delete stats;
   if(stats_shadow) delete stats_shadow;
@@ -295,9 +296,10 @@ void Host::initialize(Mac *_mac, int32_t _iface_idx, u_int16_t _vlanId,
   os_type = os_unknown;
   ssdpLocation = NULL, blacklist_name = NULL, country = NULL;
 
-  netScanDetector.t_window = 60*30; /* 30 min */
+  netScanDetector.t_window = 60*10; /* 30 min */
   netScanDetector.bucket_capacity = netScanDetector.t_window / 2; /* sliding window capacity */
-  netScanDetector.bucket = new (std::nothrow) std::deque<time_t>(); 
+  netScanDetector.bucket_queue = new (std::nothrow) std::deque<std::pair<time_t, u_int32_t>>();
+  netScanDetector.bucket_set = new (std::nothrow) std::unordered_set<u_int32_t>(); 
 
   memset(&names, 0, sizeof(names));
   memset(view_interface_mac, 0, sizeof(view_interface_mac));
@@ -1510,17 +1512,22 @@ void Host::decNumFlows(time_t t, bool as_client, bool isTCP,
 /* *************************************** */
 
 void Host::incNetScanDetectorContact(time_t cur_t, IpAddress *srv_ip) {
-  if (netScanDetector.bucket->size() < netScanDetector.bucket_capacity) {
-    if (srv_ip->isLocalHost() && !srv_ip->isGateway() && !srv_ip->isMulticastAddress() && !srv_ip->isBroadcastAddress()) {
-      netScanDetector.bucket->push_back(cur_t);
+  if (netScanDetector.bucket_queue->size() < netScanDetector.bucket_capacity) {
+    if (srv_ip->isLocalHost() && !srv_ip->isGateway() && !srv_ip->isMulticastAddress() && !srv_ip->isBroadcastAddress() &&
+        netScanDetector.bucket_set->find(srv_ip->key()) == netScanDetector.bucket_set->end()
+    ) {
+      netScanDetector.bucket_queue->push_back(std::make_pair(cur_t, srv_ip->key()));
+      netScanDetector.bucket_set->insert(srv_ip->key());
     }
   }
 }
 
 void Host::cleanupNetScanDetectorContacts(time_t cur_t) {
-  while (!(netScanDetector.bucket)->empty() &&
-         cur_t - (netScanDetector.bucket->front()) > netScanDetector.t_window)
-    netScanDetector.bucket->pop_front();
+  while (!(netScanDetector.bucket_queue)->empty() &&
+         cur_t - (netScanDetector.bucket_queue->front().first) > netScanDetector.t_window) {
+    netScanDetector.bucket_set->erase(netScanDetector.bucket_queue->front().second);
+    netScanDetector.bucket_queue->pop_front();
+  }
 }
 
 /* *************************************** */

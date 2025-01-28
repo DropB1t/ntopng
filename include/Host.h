@@ -118,7 +118,8 @@ class Host : public GenericHashEntry,
 
   /* NetScan contacted clients bucket detector */
   struct {
-    std::deque<time_t> *bucket;  // 8 bytes (pointer)
+    std::deque<std::pair<time_t, u_int32_t>> *bucket_queue;  // 8 bytes (pointer)
+    std::unordered_set<u_int32_t> *bucket_set;              // 8 bytes (pointer)
     time_t t_window;             // 8 bytes
     size_t bucket_capacity;      // 8 bytes
   } netScanDetector;
@@ -803,10 +804,12 @@ class Host : public GenericHashEntry,
   void cleanupNetScanDetectorContacts(time_t cur_t);
 
   void resetNetScanDetectorContacts() {
-    netScanDetector.bucket->clear();
+    netScanDetector.bucket_queue->clear();
+    netScanDetector.bucket_set->clear();
   }
+  
   size_t getNetScanDetectorContacts() const {
-    return netScanDetector.bucket->size();
+    return netScanDetector.bucket_set->size();
   }
 
   void incCliContactedHosts(IpAddress *peer) {
