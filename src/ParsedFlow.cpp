@@ -55,7 +55,7 @@ ParsedFlow::ParsedFlow() : ParsedFlowCore(), ParsedeBPF() {
   memset(&custom_app, 0, sizeof(custom_app));
   wlan_ssid = NULL;
   memset(&wtp_mac_address, 0, sizeof(wtp_mac_address));
-
+  l7_json = NULL;
   has_parsed_ebpf = false;
 }
 
@@ -157,6 +157,11 @@ ParsedFlow::ParsedFlow(const ParsedFlow &pf) : ParsedFlowCore(pf), ParsedeBPF(pf
   else
     wlan_ssid = NULL;
 
+  if(pf.l7_json)
+    l7_json = strdup(pf.l7_json);
+  else
+    l7_json = NULL;
+
   memcpy(&wtp_mac_address, &pf.wtp_mac_address, sizeof(wtp_mac_address));
 
   tls_cipher = pf.tls_cipher;
@@ -233,6 +238,9 @@ void ParsedFlow::fromLua(lua_State *L, int index) {
           last_switched = Utils::str2epoch(lua_tostring(L, -1));
         } else if (!strcmp(key, "l4_proto")) {
           l4_proto = Utils::l4name2proto(lua_tostring(L, -1));
+        } else if (!strcmp(key, "l7_json")) {
+          if (l7_json) free(l7_json);
+          l7_json = strdup(lua_tostring(L, -1));
         } else {
           addAdditionalField(key, json_object_new_string(lua_tostring(L, -1)));
           ntop->getTrace()->traceEvent(TRACE_DEBUG,
@@ -336,6 +344,7 @@ void ParsedFlow::freeMemory() {
   if (dhcp_client_name)     { free(dhcp_client_name); dhcp_client_name = NULL; }
   if (sip_call_id)          { free(sip_call_id); sip_call_id = NULL; }
   if (wlan_ssid)            { free(wlan_ssid); wlan_ssid = NULL; }
+  if (l7_json)              { free(l7_json); l7_json = NULL; }
 }
 
 /* *************************************** */

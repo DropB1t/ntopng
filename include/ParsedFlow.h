@@ -38,6 +38,7 @@ class ParsedFlow : public ParsedFlowCore, public ParsedeBPF {
   char *ja4c_hash;
   char *flow_risk_info;
   char *external_alert;
+  char *l7_json;
   char *smtp_rcp_to, *smtp_mail_from;
   u_int32_t src_ip_addr_pre_nat, dst_ip_addr_pre_nat,
               src_ip_addr_post_nat, dst_ip_addr_post_nat;
@@ -109,6 +110,7 @@ class ParsedFlow : public ParsedFlowCore, public ParsedeBPF {
   inline void setJA4cHash(const char *str) { if(ja4c_hash != NULL) free(ja4c_hash);  if(str) { ja4c_hash = strdup(str); } else ja4c_hash = NULL; }
   inline void setRiskInfo(const char *str) { if(flow_risk_info != NULL) free(flow_risk_info);  if(str) { flow_risk_info = strdup(str); } else flow_risk_info = NULL; }
   inline void setExternalAlert(const char *str) { if(external_alert != NULL) free(external_alert);  if(str) { external_alert = strdup(str);} else external_alert = NULL; }
+  inline void setL7JSON(const char *str) { if(l7_json != NULL) free(l7_json);  if(str) { l7_json = strdup(str);} else l7_json = NULL; }
   inline void setTLSUnsafeCipher(u_int8_t v) { tls_unsafe_cipher = v; }
   inline void setTLSCipher(u_int16_t v) { tls_cipher = v; }
   inline void setFlowVerdict(u_int8_t v) { flow_verdict = v; }
@@ -149,6 +151,7 @@ class ParsedFlow : public ParsedFlowCore, public ParsedeBPF {
   inline char* getJA4cHash(bool setToNULL = false) { char *r = ja4c_hash; if(setToNULL) ja4c_hash = NULL; return(r); }
   inline char* getRiskInfo(bool setToNULL = false) { char *r = flow_risk_info; if(setToNULL) flow_risk_info  = NULL; return(r); }
   inline char* getExternalAlert(bool setToNULL = false) { char *r = external_alert; if(setToNULL) external_alert = NULL; return(r); }
+  inline char* getL7JSON(bool setToNULL = false) { char *r = l7_json; if(setToNULL) l7_json = NULL; return(r); }
   inline char* getEndReason(bool setToNull = false) { char *r = end_reason; if(setToNull) end_reason = NULL; return(r); }
   inline char* getSMTPRcptTo(bool setToNull = false) { char *r = smtp_rcp_to; if(setToNull) smtp_rcp_to = NULL; return(r); }
   inline char* getSMTPMailFrom(bool setToNull = false) { char *r = smtp_mail_from; if(setToNull) smtp_mail_from = NULL; return(r); }

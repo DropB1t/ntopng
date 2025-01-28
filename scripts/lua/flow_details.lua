@@ -1584,6 +1584,11 @@ else
       end
    end
 
+   if(flow.l7_json ~= nil) then
+      print("<tr><th width=10%>" .. i18n("flow_details.l7_json") .. "</th><td colspan=2 style='overflow-wrap: anywhere !important; max-width: 200px; white-space: pre-wrap; word-break: keep-all; font-family: \"courier new\", courier, monospace;font-size: 13px;'>" .. flow.l7_json .. "</td></tr>\n")
+
+   end
+	       
    -- ######################################
 
    if (flow.entropy and flow.entropy.client and flow.entropy.server) then
@@ -1983,8 +1988,7 @@ else
       end
 
       if (snmpdevice ~= nil) then
-         local exporter_info_url = ntop.getHttpPrefix() .. "/lua/pro/enterprise/flowdevice_details.lua?ip=" ..
-             snmpdevice
+         local exporter_info_url = ntop.getHttpPrefix() .. "/lua/pro/enterprise/flowdevice_details.lua?ip=" .. snmpdevice
          print("<tr><th>" .. i18n("details.flow_exporter") .. "</th>")
          print("<td colspan=\"2\">" .. "<a href=" .. exporter_info_url .. ">" .. snmpdevice .. "</a></td></tr>")
 
@@ -2090,8 +2094,7 @@ else
          payload = string.reverse(string.sub(payload, idx))
       end
 
-      print(
-         "<tr><th width=10%>Payload</th><td colspan=2 style='overflow-wrap: anywhere !important; max-width: 200px; white-space: pre-wrap; word-break: keep-all; font-family: \"courier new\", courier, monospace;font-size: 13px;'>" ..
+      print("<tr><th width=10%>Payload</th><td colspan=2 style='overflow-wrap: anywhere !important; max-width: 200px; white-space: pre-wrap; word-break: keep-all; font-family: \"courier new\", courier, monospace;font-size: 13px;'>" ..
          payload .. "</td></tr>\n")
    end
 

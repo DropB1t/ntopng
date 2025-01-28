@@ -75,7 +75,7 @@ class Flow : public GenericHashEntry {
   FlowCollectionInfo *collection;
   
   /* Data collected from nProbe */
-
+  std::string l7_json;
   ICMPinfo *icmp_info;
   char *category_list_name_shared_pointer; /* NOTE: this is a pointer handled by
 					      Ntop::getPersistentCustomListNameById()
@@ -590,6 +590,8 @@ class Flow : public GenericHashEntry {
   void timeval_diff(struct timeval *begin, const struct timeval *end,
                     struct timeval *result, u_short divide_by_two);
   std::string getFlowInfo(bool isLuaRequest);
+  inline std::string getL7JSON() { return(l7_json); }
+  inline void setL7JSON(std::string j) { l7_json = j; }
   inline char *getFlowServerInfo() {
     return (isTLS() && protos.tls.client_requested_server_name)
                ? protos.tls.client_requested_server_name

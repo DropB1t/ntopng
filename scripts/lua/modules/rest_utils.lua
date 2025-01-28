@@ -342,6 +342,13 @@ local rest_utils = {
                 str = "MAX_SNMP_DEVICES_NUM_REACHED"
             },
 
+            -- ZMQ flag --encryption not present at startup
+            zmq_encryption_disabled = {
+                http_code = 503,
+                rc = -58,
+                str= "IFACE_ENCRYPTION_NOT_PRESENT"
+            },
+
             -- Checks
             not_enabled = {http_code = 400, rc = -2, str = "NOT_ENABLED"}
         }
@@ -466,6 +473,11 @@ end
 -- by setting a variable (rest_answer) rather than on HTTP
 function rest_utils.enable_direct_mode()
     rest_utils.direct_mode = true
+    rest_utils.rest_answer = nil
+end
+
+function rest_utils.disable_direct_mode()
+    rest_utils.direct_mode = false
     rest_utils.rest_answer = nil
 end
 

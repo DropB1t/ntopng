@@ -1050,6 +1050,9 @@ bool ZMQParserInterface::parsePENZeroField(ParsedFlow *const flow,
   case WTP_MAC_ADDRESS:
     if (value->string) flow->setWTPMACAddress(value->string);
     break;
+  case L7_DETAILS:
+    if (value->string) flow->setL7JSON(value->string);
+    break;
   default:
     ntop->getTrace()->traceEvent(TRACE_INFO,
 				 "Skipping no-PEN flow fieldId %u", field);

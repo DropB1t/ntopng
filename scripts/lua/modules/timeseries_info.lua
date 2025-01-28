@@ -3214,7 +3214,7 @@ end
 
 -- #################################
 
-function timeseries_info.get_host_rules_schema(rule_type)
+function timeseries_info.get_traffic_rules_schema(rule_type)
     if rule_type == "host" then
         local host_ts_enabled = ntop.getCache("ntopng.prefs.host_ndpi_timeseries_creation")
         local has_top_protocols = (host_ts_enabled == "both" or host_ts_enabled == "per_protocol")

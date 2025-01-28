@@ -335,8 +335,11 @@ void Flow::allocDPIMemory() {
 void Flow::freeDPIMemory() {
   if(ndpiFlow) {
     if(isDNS()) {
-      if(ndpiFlow && (ndpiFlow->protos.dns.is_query == 0)) {
-	      swap_requested = 1;
+      if(ndpiFlow) {
+	if((stats.get_cli2srv_packets() > 0) && (stats.get_srv2cli_packets() == 0)
+	   && (ndpiFlow->protos.dns.is_query == 0)) {
+	  swap_requested = 1;
+	}
       }
     } else if(/* !isDNS() */ ntop->getPrefs()->is_dns_cache_enabled()) {
       if(srv_host) {
@@ -1371,7 +1374,6 @@ void Flow::setExtraDissectionCompleted() {
 	(char*)ntop->getPersistentCustomListNameById((ndpiDetectedProtocol.category >> 8) & 0xFF);
       ndpiDetectedProtocol.category = (ndpi_protocol_category_t)(ndpiDetectedProtocol.category & 0xFF);
 
-
       /* We have used the trick to save in the protocolId both the list name and the protocol */
       if(ndpiDetectedProtocol.custom_category_userdata == NULL) {
 	u_int8_t list_id = (ndpiDetectedProtocol.category & 0xFF00) >> 8; /* See Ntop::nDPILoadHostnameCategory */
@@ -1989,8 +1991,7 @@ void Flow::hosts_periodic_stats_update(NetworkInterface *iface, Host *cli_host,
       } else  // client and server ARE in the same subnet
         // need to update the inner counter (just one time, will intentionally
         // skip this for srv_host)
-        cli_network_stats->incInner(
-				    tv->tv_sec,
+        cli_network_stats->incInner(tv->tv_sec,
 				    partial->get_cli2srv_packets() + partial->get_srv2cli_packets(),
 				    partial->get_cli2srv_bytes() + partial->get_srv2cli_bytes(),
 				    srv_host->get_ip()->isBroadcastAddress() ||
@@ -1998,8 +1999,7 @@ void Flow::hosts_periodic_stats_update(NetworkInterface *iface, Host *cli_host,
     }
 
     srv_network_stats = srv_host->getNetworkStats(srv_network_id);
-    srv_host->incStats(
-		       tv->tv_sec, get_protocol(), stats_protocol, get_protocol_category(),
+    srv_host->incStats(tv->tv_sec, get_protocol(), stats_protocol, get_protocol_category(),
 		       custom_app, partial->get_srv2cli_packets(),
 		       partial->get_srv2cli_bytes(), partial->get_srv2cli_goodput_bytes(),
 		       partial->get_cli2srv_packets(), partial->get_cli2srv_bytes(),
@@ -2179,8 +2179,9 @@ void Flow::hosts_periodic_stats_update(NetworkInterface *iface, Host *cli_host,
     /* Don't break, let's process also HTTP_PROXY */
   case NDPI_PROTOCOL_HTTP_PROXY:
     if(srv_host) {
-      if(!Utils::isIPAddress(host_server_name) &&
-	  hasRisk(NDPI_NUMERIC_IP_HOST)) {
+      if((!Utils::isIPAddress(host_server_name))
+	 /* && hasRisk(NDPI_NUMERIC_IP_HOST) */
+	 ) {
 	srv_host->offlineSetHTTPName(host_server_name);
       }
 
@@ -2616,14 +2617,11 @@ void Flow::update_pools_stats(NetworkInterface *iface, Host *cli_host,
 #ifdef NTOPNG_PRO
       /* Per host quota-enforcement stats */
       if(hp->enforceQuotasPerPoolMember(cli_host_pool_id)) {
-        cli_host->incQuotaEnforcementStats(
-					   tv->tv_sec, ndpiDetectedProtocol.proto.master_protocol, diff_sent_packets,
+        cli_host->incQuotaEnforcementStats(tv->tv_sec, ndpiDetectedProtocol.proto.master_protocol, diff_sent_packets,
 					   diff_sent_bytes, diff_rcvd_packets, diff_rcvd_bytes);
-        cli_host->incQuotaEnforcementStats(
-					   tv->tv_sec, ndpiDetectedProtocol.proto.app_protocol, diff_sent_packets,
+        cli_host->incQuotaEnforcementStats(tv->tv_sec, ndpiDetectedProtocol.proto.app_protocol, diff_sent_packets,
 					   diff_sent_bytes, diff_rcvd_packets, diff_rcvd_bytes);
-        cli_host->incQuotaEnforcementCategoryStats(
-						   tv->tv_sec, category_id, diff_sent_bytes, diff_rcvd_bytes);
+        cli_host->incQuotaEnforcementCategoryStats(tv->tv_sec, category_id, diff_sent_bytes, diff_rcvd_bytes);
       }
 #endif
     }
@@ -2657,14 +2655,11 @@ void Flow::update_pools_stats(NetworkInterface *iface, Host *cli_host,
        * increased even if cli and srv are on the same pool */
 #ifdef NTOPNG_PRO
       if(hp->enforceQuotasPerPoolMember(srv_host_pool_id)) {
-        srv_host->incQuotaEnforcementStats(
-					   tv->tv_sec, ndpiDetectedProtocol.proto.master_protocol, diff_rcvd_packets,
+        srv_host->incQuotaEnforcementStats(tv->tv_sec, ndpiDetectedProtocol.proto.master_protocol, diff_rcvd_packets,
 					   diff_rcvd_bytes, diff_sent_packets, diff_sent_bytes);
-        srv_host->incQuotaEnforcementStats(
-					   tv->tv_sec, ndpiDetectedProtocol.proto.app_protocol, diff_rcvd_packets,
+        srv_host->incQuotaEnforcementStats(tv->tv_sec, ndpiDetectedProtocol.proto.app_protocol, diff_rcvd_packets,
 					   diff_rcvd_bytes, diff_sent_packets, diff_sent_bytes);
-        srv_host->incQuotaEnforcementCategoryStats(
-						   tv->tv_sec, category_id, diff_rcvd_bytes, diff_sent_bytes);
+        srv_host->incQuotaEnforcementCategoryStats(tv->tv_sec, category_id, diff_rcvd_bytes, diff_sent_bytes);
       }
 #endif
     }
@@ -3030,6 +3025,9 @@ void Flow::lua(lua_State *vm, AddressTree *ptree,
                                   protos.dns.last_return_code);
     }
 
+    if(l7_json.length() > 0)
+      lua_push_str_table_entry(vm, "l7_json", l7_json.c_str());
+    
 #ifdef HAVE_NEDGE
     lua_push_uint64_table_entry(vm, "marker", marker);
 
@@ -3420,11 +3418,9 @@ void Flow::sumStats(nDPIStats *ndpi_stats, FlowStats *status_stats) {
   }
 
   /* Increase Category stats */
-  ndpi_stats->incCategoryStats(0,
-    get_protocol_category(),
-    get_bytes_cli2srv(),
-    get_bytes_srv2cli());
-
+  ndpi_stats->incCategoryStats(0, get_protocol_category(),
+			       get_bytes_cli2srv(), get_bytes_srv2cli());
+  
   status_stats->incStats(getAlertsBitmap(), protocol,
                          Utils::mapScoreToSeverity(getPredominantAlertScore()),
                          getCli2SrvDSCP(), getSrv2CliDSCP(), this);
@@ -5552,7 +5548,6 @@ void Flow::timeval_diff(struct timeval *begin, const struct timeval *end,
 
 /* *************************************** */
 
-/* FIXX this function is using buf only in a few cases */
 std::string Flow::getFlowInfo(bool isLuaRequest) {
   std::string info_field = std::string("");
 
@@ -8434,8 +8429,9 @@ void Flow::check_swap()
     if(protocol == IPPROTO_UDP) /* && (get_cli_port() > 32768) && (get_srv_port() > 32768) */ {
       /* We disable UDP swap that might be wrong in particular for probing attempts */
       ; /* Don't do anything: this might be RTP or similar */
-    } else
+    } else {
       swap_requested = 1; /* This flow will be swapped */
+    }
   }
 }
 
@@ -8663,8 +8659,9 @@ void Flow::updateTCPHostServices(Host *cli_h, Host *srv_h) {
     if(tcp) {
       if((((tcp->src2dst_tcp_flags & TH_SYN) == 0) && ((tcp->dst2src_tcp_flags & TH_SYN) != 0))
 	 || ((((tcp->src2dst_tcp_flags|tcp->dst2src_tcp_flags) & TH_SYN) == 0) /* No SYN observed */
-	     && (get_cli_port() < get_srv_port())))
+	     && (get_cli_port() < get_srv_port()))) {
 	swap_requested = 1;
+      }
     }
     break;
 
@@ -9083,10 +9080,15 @@ void Flow::allocateCollection() {
 /* *************************************** */
 
 #if defined(NTOPNG_PRO)
-  bool Flow::isFlowAllowed(bool *is_allowed) {
-    if (isTCP() || isUDP() || isICMP())
-      return iface->findFlowACL(this, is_allowed);
-    return true;  };
+/* Used by AccessControlList.cpp */
+
+bool Flow::isFlowAllowed(bool *is_allowed) {
+  if (isTCP() || isUDP() || isICMP())
+    return iface->findFlowACL(this, is_allowed);
+  else
+    return true;
+};
+
 #endif
 
 /* *************************************** */
